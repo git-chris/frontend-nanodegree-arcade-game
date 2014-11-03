@@ -1,15 +1,14 @@
 // Enemies our player must avoid
-var Enemy = function(x,y,speed) {
+var Enemy = function() {
     // Variables applied to each of our instances go here,
     // we've provided one for you to get started
 
     // The image/sprite for our enemies, this uses
     // a helper we've provided to easily load images
     this.sprite = 'images/enemy-bug.png';
-    this.x = x ;
-    this.y = y ;
-    startx=-150;    
-    this.speed=speed;
+    this.x=select([-140,-120,-220,-200]);
+    this.y=select([60,144,228,312]);       
+    this.speed=select([13,25,44,55,36,42]);
 };
 
 // Update the enemy's position, required method for game
@@ -19,32 +18,41 @@ Enemy.prototype.update = function(dt) {
     // which will ensure the game runs at the same speed for
     // all computers.   
         this.x = this.x + (1 * this.speed * dt * gemspeed);
-        if (this.x >= 800) {this.x=startx;}    
+        if (this.x >= 800) {remove(this,allEnemies);createEnemies();}    
 };
 
 var gameon=true;//var for pause and continue
 var gemspeed=1;
+
+
 // Draw the enemy on the screen, required method for game
 Enemy.prototype.render = function() {
     ctx.drawImage(Resources.get(this.sprite), this.x, this.y);
 };
 
 Enemy.prototype.reset=function(){
-   this.x=startx;   
+   allEnemies.forEach(function(enemy){remove(enemy,allEnemies)});
+   createEnemies();
 };
 
-var Gem=function(x,y,speed){
-  this.x=x;
-  this.y=y;
+var remove = function (entity, array) {
+            var index = array.indexOf(entity);
+            if (index !== -1) {
+            array.splice(index, 1);
+            }
+};
+
+var Gem=function(){
+  this.x=select([-150,-180,-200]);
+  this.y=select([60,144,228,312]);
   startx=-150;
-  this.speed=speed;
-  this.sprite=['images/Gem Blue.png','images/Gem Green.png','images/Gem Orange.png'];
+  this.speed=select([10,20,30,40,12,55,23,38,15]);
+  this.sprite=select(['images/Gem Blue.png','images/Gem Orange.png','images/Gem Green.png']);
 };
 
 var select=function(array){    
     return array[Math.floor(Math.random() * array.length)];
 };
-
 
 Gem.prototype.reset=function(){
   this.x=startx;
@@ -54,11 +62,10 @@ Gem.prototype.render=function(){
     ctx.drawImage(Resources.get(this.sprite), this.x, this.y);
 };
 
-Gem.prototype.update=function(){
+Gem.prototype.update=function(dt){
     this.x = this.x + (1 * this.speed * dt * gemspeed);
         if (this.x >= 800) {this.x=startx;} 
 };
-
 
 // Now write your own player class
 // This class requires an update(), render() and
@@ -96,8 +103,16 @@ Player.prototype.handleInput=function(key){
             break;        
     case 'pause':
                 gameon=false;
-                alert("Game paused! to continue press OK!");
-                gameon=true;
+                swal({
+                title: "Game Paused",
+                text: "Press Enter to Resume",
+                type: "warning",
+                showCancelButton: false,
+                confirmButtonColor: "#DD6B55",
+                confirmButtonText: "Resume!",
+                closeOnConfirm: true
+                }),function(){               
+                gameon = true;};
             break;
             ;}
         };
@@ -117,16 +132,16 @@ Player.prototype.reset = function() {
 
 var allEnemies=[];
 var createEnemies=function(){
-    allEnemies.push(new Enemy(-150,60,23));
-    allEnemies.push(new Enemy(-150,228,42));
-    allEnemies.push(new Enemy(-150,144,37));
-    allEnemies.push(new Enemy(-150,60,50));
-    allEnemies.push(new Enemy(-150,312,88));
+   while(allEnemies.length<3){allEnemies.push(new Enemy())};
 };
 
 var gems=[];
+var creategems=function(){
+   while(gems.length<2){gems.push(new Gem())};
+};
 var player=new Player();
 var bluegems=0;
+var greengems=0;
 
 
 

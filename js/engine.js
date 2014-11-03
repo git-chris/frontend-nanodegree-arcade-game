@@ -7,13 +7,12 @@ var Engine = (function(global) {
         lastTime;
 
     canvas.width = 807;
-    canvas.height = 800;
+    canvas.height = 700;
     doc.body.appendChild(canvas);
-
-    
+ 
     function main() {         
         var now = Date.now(),
-            dt = (now - lastTime) / 1000.0;       
+            dt = (now - lastTime) / 1000.0;        
         if(gameon){             
            update(dt);
         };
@@ -25,10 +24,29 @@ var Engine = (function(global) {
     
     function start(){        
        gameon=false;
-       $('#dialog').dialog();
-       $('html').click(function() {
-        gameon=true;
-       });
+       swal({
+            title: "Welcome",
+            text: "This is my version of Frogger. Press ENTER to Continue!",
+            type: "info",
+            showCancelButton: false,            
+            confirmButtonText: "Next!",
+            closeOnConfirm: false},
+            function(){
+                swal({title:"Objectives",
+                      text:"Collect as many Blue gems as you can.  \n\
+                            Collect 4 Green and Earn an Extra Life.\n\
+                            Orange gems are special! ",
+                      confirmButtonText: "Next!",
+                      closeOnConfirm: false},
+                    function(){    
+                        swal({title:"Instructions",
+                              text:"Use Arrow Keys for Movement. \n\
+                                    Key P for Pausing.\n\
+                                    Press Enter to Start the Game.",
+                              confirmButtonText: "Start!"},
+                            function(){gameon=true;});
+                    });
+            });
     };
            
     
@@ -36,48 +54,77 @@ var Engine = (function(global) {
         lastTime = Date.now();
         start();        
         main();     
-        createEnemies();        
+        createEnemies();
+        creategems();
     }
 
     function update(dt) {        
        updateEntities(dt);
-       checkCollisions(dt);
+       checkCollisions();
+       pickgems();       
        drown();      
     };    
     
     function drown(){
         y=player.y;
         if(y<60 | y>312){
-            new Audio("bubbling1.wav").play();
-            alert('You cannot swim! Ok?');
-            reset()};    
+            new Audio("audio/bubbling1.wav").play();
+            gameon=false;
+            swal({
+                title: "You Just Drowned!",
+                text: "Press Enter to Resume",
+                type: "warning",
+                showCancelButton: false,
+                confirmButtonColor: "#DD6B55",
+                confirmButtonText: "Resume!",
+                closeOnConfirm: true
+                },function(){gameon=true;});
+                reset();
+        };    
     };
     
     function checkCollisions(){
         var y=player.y;
         var x=player.x;        
         allEnemies.forEach(function(enemy) {
-           if(enemy.y==y){ 
-             if(enemy.x+50>x & x+50>enemy.x){                             
-               reset();
-            };            
-           ;}       
+           if(enemy.y==y){               
+             if(enemy.x+50>x & x+50>enemy.x){
+                 new Audio("audio/punch.mp3").play();
+                gameon=false;
+                swal({
+                title: "A Bug Just Ate You!",
+                text: "Press Enter to Resume",
+                type: "warning",
+                showCancelButton: false,
+                confirmButtonColor: "#DD6B55",
+                confirmButtonText: "Resume!",
+                closeOnConfirm: true
+                },function(){gameon=true;});
+                reset();           
+            };        
+           };       
         });        
     };
     
-    function pickgems(){
-      greengems.forEach(function(gem) {
-            if(gem.x==player.x&&gem.y==player.y){
-              gemspeed*=2;  
-            };            
-        });
-    };
+    
+    
+    function pickgems() {
+      gems.forEach(function (gem) {
+      if (player.x<gem.x+50 && player.x>gem.x-50 && player.y === gem.y) {
+        if (gem.sprite=='images/Gem Blue.png') {bluegems+=1;remove(gem,gems);}
+        else if (gem.sprite=='images/Gem Orange.png'){gemspeed+=5;remove(gem,gems);}
+        else if (gem.sprite=='images/Gem Green.png'){greengems+=1;remove(gem,gems);}           
+           }; 
+           extralives();
+           creategems();
+           renderscore();
+      });
+    };   
+    
 
     function updateEntities(dt) {       
-        allEnemies.forEach(function(enemy) {
-            enemy.update(dt);
-        });   
-               
+        allEnemies.forEach(function(enemy){enemy.update(dt);});
+        gems.forEach(function(gem){gem.update(dt);});
     };
 
     function render() {
@@ -95,7 +142,7 @@ var Engine = (function(global) {
 
         for (row = 0; row < numRows; row++) {
             for (col = 0; col < numCols; col++) {                 
-                ctx.drawImage(Resources.get(rowImages[row]), col * 101, row * 83);
+                ctx.drawImage(Resources.get(rowImages[row]), col * 101, row * 83);                
             };
         };
         renderEntities();
@@ -104,15 +151,17 @@ var Engine = (function(global) {
     function renderEntities() {
         allEnemies.forEach(function(enemy) {
             enemy.render();            
-        });        
+        });
+        gems.forEach(function(gem) {
+            gem.render();            
+        });       
         player.render(); 
         renderlives();
-        renderdiamonds();
-        
+        renderscore();
     };
         
     function renderlives(){       
-        ctx.rect(10, 600, 150, 40);
+        ctx.rect(10, 600, 200, 40);
         ctx.fillStyle=('#81ccee');
         ctx.fill();
         var x=10;
@@ -123,11 +172,23 @@ var Engine = (function(global) {
         };      
     };
     
-    function renderdiamonds(){
-        ctx.drawImage(Resources.get('images/rsz_gem_blue.png'),15,2);        
+    function extralives(){
+      if (greengems===4){
+        new Audio("audio/Ta Da.mp3").play();
+        player.lives+=1;
+        renderlives();
+        greengems=0;}
+    };
+    
+    function renderscore(){
+        ctx.fillStyle=('#81ccee');
+        ctx.fillRect(15,2,180,45);
+        ctx.drawImage(Resources.get('images/rsz_gem_blue.png'),15,2);       
         ctx.fillStyle=('black');
         ctx.font=('20px Verdana');        
         ctx.fillText(':'+bluegems,60,40);
+        ctx.drawImage(Resources.get('images/rsz_gem_green.png'),110,2);
+        ctx.fillText(':'+greengems,155,40);
     };
 
     function reset() {        
@@ -137,15 +198,18 @@ var Engine = (function(global) {
         player.reset();
         player.lives-=1;
         if(!player.lives){gameover();};
-        renderlives();
+        renderlives();        
     };
     
-    function gameover(){  
-        new Audio("buzzer_x.wav").play();
+    function gameover(){
+        ctx.rect(10, 600, 150, 40);
+        ctx.fillStyle=('#81ccee');
+        ctx.fill();
+        new Audio("audio/buzzer_x.wav").play();
         ctx.fillStyle=('black');
         ctx.font=('80px Verdana');        
         ctx.fillText('GAME OVER...',200,500);
-        canvas.freeze();        
+        canvas.freeze();
     };
     
     
@@ -159,7 +223,9 @@ var Engine = (function(global) {
         'images/Star.png',
         'images/rsz_gem_blue.png',
         'images/Gem Green.png',
-        'images/Gem Orange.png'
+        'images/Gem Orange.png',
+        'images/Gem Blue.png',
+        'images/rsz_gem_green.png'
     ]);
     Resources.onReady(init);
 

@@ -4,6 +4,8 @@ body {
     color: yellow; 
 }
 
-#dialog{
-    
+#restart{   
+    margin-top: 0;
+    margin:auto;
+    display:block;
 }
