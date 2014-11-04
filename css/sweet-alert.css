@@ -11,7 +11,7 @@
 
 .sweet-alert {
   background-color: white;
-  font-family: 'Open Sans', sans-serif;
+  font-family: '../fonts/manaspc.ttf', Manaspc;
   width: 478px;
   padding: 17px;
   border-radius: 5px;

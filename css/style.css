@@ -1,11 +1,24 @@
-body {
+@font-face {
+    font-family: Manaspc;
+    src: url('../fonts/manaspc.ttf');
+}
+
+body{
     text-align: center;
     background-color: #81ccee ;
     color: yellow; 
+    font-family: Manaspc;
 }
 
-#restart{   
-    margin-top: 0;
-    margin:auto;
-    display:block;
+#restart{       
+    margin: auto;
+    display: block;
+    margin-bottom: 10px;
+    width: 100px;
+}
+
+footer{
+    text-align: left;
+    font-size: small;
+    font-family: sans-serif;
 }

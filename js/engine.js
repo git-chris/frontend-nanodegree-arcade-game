@@ -12,7 +12,8 @@ var Engine = (function(global) {
  
     function main() {         
         var now = Date.now(),
-            dt = (now - lastTime) / 1000.0;        
+            dt = (now - lastTime) / 1000.0;  
+            /*With gameon var I am pausing the game*/
         if(gameon){             
            update(dt);
         };
@@ -20,8 +21,7 @@ var Engine = (function(global) {
         lastTime = now;
         win.requestAnimationFrame(main);        
     };
-    
-    
+      /*Start  messages with instructions*/  
     function start(){        
        gameon=false;
        swal({
@@ -47,9 +47,8 @@ var Engine = (function(global) {
                             function(){gameon=true;});
                     });
             });
-    };
-           
-    
+    };           
+    /*Initialize the game by creating Entities*/
     function init() {       
         lastTime = Date.now();
         start();        
@@ -57,7 +56,7 @@ var Engine = (function(global) {
         createEnemies();
         creategems();
     }
-
+    /*In the update I check also for player boundaries on y axis with drown function*/
     function update(dt) {        
        updateEntities(dt);
        checkCollisions();
@@ -88,7 +87,7 @@ var Engine = (function(global) {
         var x=player.x;        
         allEnemies.forEach(function(enemy) {
            if(enemy.y==y){               
-             if(enemy.x+50>x & x+50>enemy.x){
+             if(enemy.x+50>x & x+50>enemy.x){   //By checking the distance player x coordinate has from right and left we have collision
                  new Audio("audio/punch.mp3").play();
                 gameon=false;
                 swal({
@@ -104,23 +103,20 @@ var Engine = (function(global) {
             };        
            };       
         });        
-    };
-    
-    
+    };  
     
     function pickgems() {
       gems.forEach(function (gem) {
       if (player.x<gem.x+50 && player.x>gem.x-50 && player.y === gem.y) {
         if (gem.sprite=='images/Gem Blue.png') {bluegems+=1;remove(gem,gems);}
-        else if (gem.sprite=='images/Gem Orange.png'){gemspeed+=5;remove(gem,gems);}
+        else if (gem.sprite=='images/Gem Orange.png'){gemspeed+=1;remove(gem,gems);}
         else if (gem.sprite=='images/Gem Green.png'){greengems+=1;remove(gem,gems);}           
            }; 
-           extralives();
-           creategems();
+           extralives(); //Right after picking a gem checking if greengems reached 4
+           creategems(); // Create missing gems from gameplay
            renderscore();
       });
-    };   
-    
+    };     
 
     function updateEntities(dt) {       
         allEnemies.forEach(function(enemy){enemy.update(dt);});
@@ -201,6 +197,7 @@ var Engine = (function(global) {
         renderlives();        
     };
     
+    //Game ends. Canvas freezes and needs restart
     function gameover(){
         ctx.rect(10, 600, 150, 40);
         ctx.fillStyle=('#81ccee');
@@ -208,7 +205,7 @@ var Engine = (function(global) {
         new Audio("audio/buzzer_x.wav").play();
         ctx.fillStyle=('black');
         ctx.font=('80px Verdana');        
-        ctx.fillText('GAME OVER...',200,500);
+        ctx.fillText('GAME OVER...',150,400);
         canvas.freeze();
     };
     

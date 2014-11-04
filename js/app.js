@@ -1,10 +1,6 @@
 // Enemies our player must avoid
-var Enemy = function() {
-    // Variables applied to each of our instances go here,
-    // we've provided one for you to get started
-
-    // The image/sprite for our enemies, this uses
-    // a helper we've provided to easily load images
+//random speed and starting point with select()
+var Enemy = function() {    
     this.sprite = 'images/enemy-bug.png';
     this.x=select([-140,-120,-220,-200]);
     this.y=select([60,144,228,312]);       
@@ -12,29 +8,32 @@ var Enemy = function() {
 };
 
 // Update the enemy's position, required method for game
-// Parameter: dt, a time delta between ticks
+// Parameter: dt, a time delta between ticks 
 Enemy.prototype.update = function(dt) {
     // You should multiply any movement by the dt parameter
     // which will ensure the game runs at the same speed for
-    // all computers.   
-        this.x = this.x + (1 * this.speed * dt * gemspeed);
+    // all computers. 
+    //!I added gemspeed. Increases by picking orange gems
+        this.x = this.x + (1 * this.speed * dt + gemspeed);
         if (this.x >= 800) {remove(this,allEnemies);createEnemies();}    
 };
 
-var gameon=true;//var for pause and continue
+var gameon=true; //var for pause and continue
 var gemspeed=1;
-
 
 // Draw the enemy on the screen, required method for game
 Enemy.prototype.render = function() {
     ctx.drawImage(Resources.get(this.sprite), this.x, this.y);
 };
 
+//When a bug resets either by player loss or by reaching end of canvas
+//is destroyed and recreated at random starting point
 Enemy.prototype.reset=function(){
    allEnemies.forEach(function(enemy){remove(enemy,allEnemies)});
    createEnemies();
 };
 
+//Destroying from gameplay picked up Gems and Enemies
 var remove = function (entity, array) {
             var index = array.indexOf(entity);
             if (index !== -1) {
@@ -54,6 +53,7 @@ var select=function(array){
     return array[Math.floor(Math.random() * array.length)];
 };
 
+//Gems return to start x position. Not destroyed until picked up!
 Gem.prototype.reset=function(){
   this.x=startx;
 };
@@ -67,13 +67,10 @@ Gem.prototype.update=function(dt){
         if (this.x >= 800) {this.x=startx;} 
 };
 
-// Now write your own player class
-// This class requires an update(), render() and
-// a handleInput() method.
 var Player=function(){
     this.sprite='images/char-boy.png';    
-    this.x=700;
-    this.y=60;
+    this.x=700; //fixed x axis posotion
+    this.y=60;  //fixed y axis position
     this.lives=3;
 };
 
@@ -81,9 +78,8 @@ Player.prototype.render=function(){
     ctx.drawImage(Resources.get(this.sprite), this.x, this.y);
 };
 
-
 Player.prototype.handleInput=function(key){      
-     if(gameon){ 
+     if(gameon){ //disables key response if game paused
         switch(key){           
             case 'left':/*If statement sets boundaries to left movement*/
                if(!(this.x<20)){               
@@ -126,10 +122,8 @@ Player.prototype.reset = function() {
 // Now instantiate your objects.
 // Place all enemy objects in an array called allEnemies
 // Place the player object in a variable called player
-
-
-
-
+// Place Gems in gems array
+// bluegems and greengems are for score and lives respectively
 var allEnemies=[];
 var createEnemies=function(){
    while(allEnemies.length<3){allEnemies.push(new Enemy())};
@@ -142,8 +136,6 @@ var creategems=function(){
 var player=new Player();
 var bluegems=0;
 var greengems=0;
-
-
 
 // This listens for key presses and sends the keys to your
 // Player.handleInput() method. You don't need to modify this.
