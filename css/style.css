@@ -6,11 +6,11 @@
 body{
     text-align: center;
     background-color: #81ccee ;
-    color: yellow; 
+    color: yellow;
     font-family: Manaspc;
 }
 
-#restart{       
+#restart{
     margin: auto;
     display: block;
     margin-bottom: 10px;
