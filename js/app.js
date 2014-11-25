@@ -79,14 +79,14 @@ Player.prototype.render = function() {
 };
 
 Player.prototype.handleInput = function(key) {
-    if(gameon){ //disables key response if game paused
+    if(gameon){ /**disables key response if game paused*/
         switch(key) {
-            case 'left':/*If statement sets boundaries to left movement*/
+            case 'left':/**If statement sets boundaries to left movement*/
                if(!(this.x<20)){
                 this.x = this.x-101;
                 };
             break;
-        case 'right':/*Same as above*/
+        case 'right':/**Same as above*/
                 if(!(this.x>690)){
                 this.x = this.x+101;
                 };
@@ -107,8 +107,8 @@ Player.prototype.handleInput = function(key) {
                 confirmButtonColor: "#DD6B55",
                 confirmButtonText: "Resume!",
                 closeOnConfirm: true
-                }),function() {
-                gameon = true;};
+                },function() {
+                gameon = true;});
             break;
             ;}
         };
