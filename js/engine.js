@@ -1,3 +1,7 @@
+/**
+ *
+ * @Function
+ */
 var Engine = (function(global) {
     var doc = global.document,
         win = global.window,
@@ -13,7 +17,7 @@ var Engine = (function(global) {
     function main() {
         var now = Date.now(),
             dt = (now - lastTime) / 1000.0;
-        /**With gameon var I am pausing the game*/
+        //With gameon var I am pausing the game
         if(gameon){
             update(dt);
         };
@@ -21,7 +25,11 @@ var Engine = (function(global) {
         lastTime = now;
         win.requestAnimationFrame(main);
     };
-    /**Start  messages with instructions*/
+
+    /**
+     * Start  messages with instructions
+     * @function
+     */
     function start() {
         gameon = false;
         swal({
@@ -48,15 +56,22 @@ var Engine = (function(global) {
                     });
             });
     };
-    /**Initialize the game by creating Entities*/
+    /**
+     * Initialize the game by creating Entities
+     *@function
+     */
     function init() {
         lastTime = Date.now();
         start();
         main();
         createEnemies();
-        creategems();
-    }
-    /**In the update I check also for player boundaries on y axis with drown function*/
+        createGems();
+    };
+
+    /**
+     * In the update I check also for player boundaries on y axis with drown function
+     * @function
+     */
     function update(dt) {
         updateEntities(dt);
         checkCollisions();
@@ -64,6 +79,10 @@ var Engine = (function(global) {
         drown();
     };
 
+    /**
+     * Checks when stepping on water
+     * @function
+     */
     function drown() {
         y = player.y;
         if(y<60 | y>312){
@@ -82,6 +101,10 @@ var Engine = (function(global) {
         };
     };
 
+    /**
+     *
+     * @function
+     */
     function checkCollisions() {
         var y = player.y;
         var x = player.x;
@@ -105,6 +128,10 @@ var Engine = (function(global) {
         });
     };
 
+    /**
+     *
+     * @function
+     */
     function pickGems() {
         gems.forEach(function (gem) {
         if (player.x<gem.x+50 && player.x>gem.x-50 && player.y === gem.y){
@@ -118,11 +145,20 @@ var Engine = (function(global) {
       });
     };
 
+    /**
+     *
+     * @param {type} dt
+     * @function
+     */
     function updateEntities(dt) {
         allEnemies.forEach(function(enemy) {enemy.update(dt);});
         gems.forEach(function(gem) {gem.update(dt);});
     };
 
+    /**
+     * Draw game field
+     * @function
+     */
     function render() {
         var rowImages = [
                 'images/water-block.png',
@@ -135,7 +171,6 @@ var Engine = (function(global) {
             numRows = 6,
             numCols = 8,
             row, col;
-
         for (row = 0; row < numRows; row++) {
             for (col = 0; col < numCols; col++) {
                 ctx.drawImage(Resources.get(rowImages[row]), col * 101, row * 83);
@@ -144,6 +179,10 @@ var Engine = (function(global) {
         renderEntities();
     };
 
+    /**
+     * Place all elements on canvas
+     * @function
+     */
     function renderEntities() {
         allEnemies.forEach(function(enemy) {
             enemy.render();
@@ -156,6 +195,10 @@ var Engine = (function(global) {
         renderScore();
     };
 
+    /**
+     * Draw lives
+     * @function
+     */
     function renderLives() {
         ctx.rect(10, 600, 200, 40);
         ctx.fillStyle = ('#81ccee');
@@ -168,6 +211,10 @@ var Engine = (function(global) {
         };
     };
 
+    /**
+     * For every 4 green gems you earn an extra life
+     * @function
+     */
     function extraLives() {
         if (greenGems === 4){
             new Audio("audio/Ta Da.mp3").play();
@@ -177,6 +224,10 @@ var Engine = (function(global) {
         };
     };
 
+    /**
+     * Draws score
+     * @function
+     */
     function renderScore() {
         ctx.fillStyle = ('#81ccee');
         ctx.fillRect(15,2,180,45);
@@ -188,6 +239,10 @@ var Engine = (function(global) {
         ctx.fillText(':'+greenGems,155,40);
     };
 
+    /**
+     * Resets game on starting positions
+     * @function
+     */
     function reset() {
          allEnemies.forEach(function(enemy) {
             enemy.reset();
@@ -198,7 +253,10 @@ var Engine = (function(global) {
         renderLives();
     };
 
-    /**Game ends. Canvas freezes and needs restart*/
+    /**
+     * Game ends. Canvas freezes and needs restart
+     * @function
+     */
     function gameover() {
         ctx.rect(10, 600, 150, 40);
         ctx.fillStyle = ('#81ccee');
@@ -210,7 +268,9 @@ var Engine = (function(global) {
         canvas.freeze();
     };
 
-
+    /**
+     * Preloaded images neede for game
+     */
     Resources.load([
         'images/stone-block.png',
         'images/water-block.png',
@@ -227,5 +287,8 @@ var Engine = (function(global) {
     ]);
     Resources.onReady(init);
 
+    /**
+     * @public
+     */
     global.ctx = ctx;
 })(this);
